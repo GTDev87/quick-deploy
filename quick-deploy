@@ -1,0 +1,11 @@
+#!/bin/bash
+IP=$1
+DOCKER_FILE_LOCATION=$2
+PORT=$3
+
+IMAGE_NAME={{DOCKER_FILE_LOCATION,,}//\//_}
+
+#docker-machine create  --driver generic --generic-ip-address $IP $IP-machine
+#eval "$(docker-machine env $IP-machine)"
+#docker build --rm -t $IP$IMAGE_NAME $DOCKER_FILE_LOCATION
+#docker run -d -p PORT:80 $IMAGE_NAME
