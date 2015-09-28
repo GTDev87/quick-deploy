@@ -3,7 +3,10 @@ IP=$1
 DOCKER_FILE_LOCATION=$2
 PORT=$3
 
-IMAGE_NAME={{DOCKER_FILE_LOCATION,,}//\//_}
+# lower case DOCKER_FILE_LOCATION value and replace all / with _
+# only works for bash 4.0
+IMAGE_NAME=`echo ${DOCKER_FILE_LOCATION,,} | sed "s/\//_/g"`
+echo $IMAGE_NAME
 
 #docker-machine create  --driver generic --generic-ip-address $IP $IP-machine
 #eval "$(docker-machine env $IP-machine)"
