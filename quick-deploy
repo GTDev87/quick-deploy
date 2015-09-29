@@ -1,13 +1,55 @@
 #!/bin/bash
-IP=$1
-DOCKER_FILE_LOCATION=$2
-PORT=$3
 
-# lower case DOCKER_FILE_LOCATION value and replace all / with _
-# only works for bash 4.0
+# Argument = -i ip-address -d dockerfile -p port
+
+usage()
+{
+  cat << EOF
+usage: $0 options
+
+This script deploys dockerfile code to IP address and port.
+
+OPTIONS:
+  -i      IP Address
+  -d      Dockerfile Location
+  -p      Port
+EOF
+}
+
+IP=
+DOCKER_FILE_LOCATION=
+PORT=
+
+while getopts i:d:p: OPTION; do
+  case $OPTION in
+    i)
+      IP=$OPTARG
+      ;;
+    d)
+      DOCKER_FILE_LOCATION=$OPTARG
+      ;;
+    p)
+      PORT=$OPTARG
+      ;;
+    ?)
+      usage
+      exit
+      ;;
+   esac
+done
+
+echo "IP" = $IP
+echo "DOCKER_FILE_LOCATION" = $DOCKER_FILE_LOCATION
+echo "PORT" = $PORT
+
+if [[ -z $IP ]] || [[ -z $DOCKER_FILE_LOCATION ]] || [[ -z $PORT ]]
+then
+  usage
+  exit 1
+fi
+
 MACHINE_NAME=$IP-machine
 IMAGE_NAME=$IP`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "s/\//_/g"`
-echo $IMAGE_NAME
 
 docker-machine create  --driver generic --generic-ip-address $IP $MACHINE_NAME
 eval "$(docker-machine env $MACHINE_NAME)"
