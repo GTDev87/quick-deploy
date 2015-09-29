@@ -13,7 +13,7 @@ OPTIONS:
   -i      IP Address
   -d      Path To Dockerfile
   -p      Port
-  -k      Path To SSH Key (Optional Default $HOME/.ssh/id_rsa saves after the firest time)
+  -k      Path To SSH Key (Optional Default $HOME/.ssh/id_rsa only required first time running)
 EOF
 }
 
