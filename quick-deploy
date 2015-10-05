@@ -14,6 +14,7 @@ OPTIONS:
   -d      Path To Dockerfile
   -p      Port
   -k      Path To SSH Key (Optional Default $HOME/.ssh/id_rsa only required first time running)
+  -e      Enviornment Variables to set (-e key1=value1 -e key2=value2)
 EOF
 }
 
@@ -21,8 +22,9 @@ IP=
 DOCKER_FILE_LOCATION=
 PORT=
 SSH_KEY=$HOME/.ssh/id_rsa
+ENV_COMMAND=
 
-while getopts i:d:p:k:: OPTION; do
+while getopts i:d:p:e:k:: OPTION; do
   case $OPTION in
     i)
       IP=$OPTARG
@@ -35,6 +37,9 @@ while getopts i:d:p:k:: OPTION; do
       ;;
     k)
       SSH_KEY=$OPTARG
+      ;;
+    e)
+      ENV_COMMAND+="-e "$OPTARG" "
       ;;
     ?)
       usage
@@ -53,11 +58,14 @@ echo "IP" = $IP
 echo "DOCKER_FILE_LOCATION" = $DOCKER_FILE_LOCATION
 echo "PORT" = $PORT
 echo "SSH_KEY" = $SSH_KEY
+echo "ENV_COMMAND" = $ENV_COMMAND
 
 MACHINE_NAME=$IP-machine
 IMAGE_NAME=$IP`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "s/\//_/g"`
 
+echo "IMAGE_NAME" = $IMAGE_NAME
+
 docker-machine create  --driver generic --generic-ip-address $IP $MACHINE_NAME --generic-ssh-key $SSH_KEY
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
-docker run -d -p $PORT:80 $IMAGE_NAME
+docker run -d -p $PORT:80 -e 'CLIENT_IP='$IP -e 'HOST_PORT='$PORT $ENV_COMMAND $IMAGE_NAME
