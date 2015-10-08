@@ -62,3 +62,5 @@ docker-machine create  --driver virtualbox $MACHINE_NAME
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
 docker run -d -p $PORT:80 -e 'HOST_PORT='$PORT $ENV_COMMAND $IMAGE_NAME
+echo IP = `docker-machine ip $MACHINE_NAME`
+
