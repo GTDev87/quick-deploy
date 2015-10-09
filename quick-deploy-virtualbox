@@ -14,6 +14,7 @@ OPTIONS:
   -d      Path To Dockerfile
   -p      Port
   -e      Enviornment Variables to set (-e key1=value1 -e key2=value2)
+  -f      folder to include
 EOF
 }
 
@@ -21,8 +22,10 @@ MACHINE_NAME=
 DOCKER_FILE_LOCATION=
 PORT=
 ENV_COMMAND=
+FILE_INCLUDE=
+IMPORT_FOLDER=/.tmp
 
-while getopts m:d:p:e:k:: OPTION; do
+while getopts m:d:p:e:f:k:: OPTION; do
   case $OPTION in
     m)
       MACHINE_NAME=$OPTARG
@@ -35,6 +38,9 @@ while getopts m:d:p:e:k:: OPTION; do
       ;;
     e)
       ENV_COMMAND+="-e "$OPTARG" "
+      ;;
+    f)
+      FILE_INCLUDE=$OPTARG
       ;;
     ?)
       usage
@@ -53,6 +59,7 @@ echo "MACHINE_NAME" = $MACHINE_NAME
 echo "DOCKER_FILE_LOCATION" = $DOCKER_FILE_LOCATION
 echo "PORT" = $PORT
 echo "ENV_COMMAND" = $ENV_COMMAND
+echo "FILE_INCLUDE" = $FILE_INCLUDE
 
 IMAGE_NAME=$MACHINE_NAME`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "s/\//_/g"`
 
@@ -61,6 +68,10 @@ echo "IMAGE_NAME" = $IMAGE_NAME
 docker-machine create  --driver virtualbox $MACHINE_NAME 
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
-docker run -d -p $PORT:80 -e 'HOST_PORT='$PORT $ENV_COMMAND $IMAGE_NAME
+docker run -d -p $PORT:80 -e 'HOST_PORT='$PORT -e 'IMPORT_FOLDER='IMPORT_FOLDER $ENV_COMMAND $IMAGE_NAME
+docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
+docker-machine ssh $MACHINE_NAME "sudo chown docker:staff $IMPORT_FOLDER"
+if [[ -n $FILE_INCLUDE ]]; then
+  docker-machine scp $FILE_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
+fi
 echo IP = `docker-machine ip $MACHINE_NAME`
-
