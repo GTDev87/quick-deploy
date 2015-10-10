@@ -78,9 +78,12 @@ echo "MACHINE_NAME" = $MACHINE_NAME
 docker-machine create  --driver generic --generic-ip-address $IP $MACHINE_NAME --generic-ssh-key $SSH_KEY
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
-docker run -d -p $PORT:80 --env 'CLIENT_IP='$IP --env 'HOST_PORT='$PORT --env 'IMPORT_FOLDER='$IMPORT_FOLDER $ENV_COMMAND $IMAGE_NAME
-echo docker run -d -p $PORT:80 --env 'CLIENT_IP='$IP --env 'HOST_PORT='$PORT --env 'IMPORT_FOLDER='$IMPORT_FOLDER $ENV_COMMAND $IMAGE_NAME
 docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
 if [[ -n $FILE_INCLUDE ]]; then
   docker-machine scp $FILE_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
 fi
+CONTAINER_VOLUME=/mnt
+
+docker run -d -p $PORT:80 -v $IMPORT_FOLDER:$CONTAINER_VOLUME:ro -e 'CLIENT_IP='$IP -e 'HOST_PORT='$PORT -e 'CONTAINER_VOLUME='$CONTAINER_VOLUME $ENV_COMMAND $IMAGE_NAME
+echo docker run -d -p $PORT:80 -v $IMPORT_FOLDER:$CONTAINER_VOLUME:ro -e 'CLIENT_IP='$IP -e 'HOST_PORT='$PORT -e 'CONTAINER_VOLUME='$CONTAINER_VOLUME $ENV_COMMAND $IMAGE_NAME
+
