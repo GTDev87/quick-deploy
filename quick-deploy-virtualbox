@@ -23,7 +23,6 @@ DOCKER_FILE_LOCATION=
 PORT=
 ENV_COMMAND=
 FILE_INCLUDE=
-IMPORT_FOLDER=/.tmp
 
 while getopts m:d:p:e:f: OPTION; do
   case $OPTION in
@@ -55,11 +54,14 @@ then
   exit 1
 fi
 
+IMPORT_FOLDER=/.tmp$PORT
+
 echo "MACHINE_NAME" = $MACHINE_NAME
 echo "DOCKER_FILE_LOCATION" = $DOCKER_FILE_LOCATION
 echo "PORT" = $PORT
 echo "ENV_COMMAND" = $ENV_COMMAND
 echo "FILE_INCLUDE" = $FILE_INCLUDE
+echo "IMPORT_FOLDER" = $IMPORT_FOLDER
 
 IMAGE_NAME=$MACHINE_NAME`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "s/\//_/g"`
 
