@@ -67,6 +67,7 @@ echo "PORT" = $PORT
 echo "SSH_KEY" = $SSH_KEY
 echo "ENV_COMMAND" = $ENV_COMMAND
 echo "FILE_INCLUDE" = $FILE_INCLUDE
+echo "IMPORT_FOLDER" = $IMPORT_FOLDER
 
 MACHINE_NAME=$IP-machine
 IMAGE_NAME=$IP`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "s/\//_/g"`
