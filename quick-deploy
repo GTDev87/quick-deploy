@@ -27,7 +27,7 @@ ENV_COMMAND=
 FILE_INCLUDE=
 IMPORT_FOLDER=/.tmp
 
-while getopts i:d:p:e:k:: OPTION; do
+while getopts i:d:p:e:f:k:: OPTION; do
   case $OPTION in
     i)
       IP=$OPTARG
@@ -42,7 +42,7 @@ while getopts i:d:p:e:k:: OPTION; do
       SSH_KEY=$OPTARG
       ;;
     e)
-      ENV_COMMAND+="-e "$OPTARG" "
+      ENV_COMMAND+="--env "$OPTARG" "
       ;;
     f)
       FILE_INCLUDE=$OPTARG
@@ -71,13 +71,14 @@ MACHINE_NAME=$IP-machine
 IMAGE_NAME=$IP`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "s/\//_/g"`
 
 echo "IMAGE_NAME" = $IMAGE_NAME
+echo "MACHINE_NAME" = $MACHINE_NAME
 
 docker-machine create  --driver generic --generic-ip-address $IP $MACHINE_NAME --generic-ssh-key $SSH_KEY
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
-docker run -d -p $PORT:80 -e 'CLIENT_IP='$IP -e 'HOST_PORT='$PORT $ENV_COMMAND $IMAGE_NAME
+docker run -d -p $PORT:80 --env 'CLIENT_IP='$IP --env 'HOST_PORT='$PORT --env 'IMPORT_FOLDER='$IMPORT_FOLDER $ENV_COMMAND $IMAGE_NAME
+echo docker run -d -p $PORT:80 --env 'CLIENT_IP='$IP --env 'HOST_PORT='$PORT --env 'IMPORT_FOLDER='$IMPORT_FOLDER $ENV_COMMAND $IMAGE_NAME
 docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
-docker-machine ssh $MACHINE_NAME "sudo chown docker $IMPORT_FOLDER"
 if [[ -n $FILE_INCLUDE ]]; then
   docker-machine scp $FILE_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
 fi
