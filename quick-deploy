@@ -82,7 +82,9 @@ eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
 docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
 if [[ -n $FILES_INCLUDE ]]; then
-  docker-machine scp $FILES_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
+  for file in $FILES_INCLUDE; do
+    docker-machine scp $file $MACHINE_NAME:$IMPORT_FOLDER
+  done
 fi
 CONTAINER_VOLUME=/mnt
 

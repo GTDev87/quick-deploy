@@ -82,7 +82,9 @@ docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
 docker-machine ssh $MACHINE_NAME "sudo chown docker:staff $IMPORT_FOLDER"
 
 if [[ -n $FILES_INCLUDE ]]; then
-  docker-machine scp $FILES_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
+  for file in $FILES_INCLUDE; do
+    docker-machine scp $file $MACHINE_NAME:$IMPORT_FOLDER
+  done
 fi
 
 CONTAINER_VOLUME=/mnt
