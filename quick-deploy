@@ -15,7 +15,7 @@ OPTIONS:
   -p      Port
   -k      Path To SSH Key (Optional Default $HOME/.ssh/id_rsa only required first time running)
   -e      Enviornment Variables to set (-e key1=value1 -e key2=value2)
-  -f      folder to include
+  -f      files to include (-f /filename1 -f /filename2)
 EOF
 }
 
@@ -26,7 +26,7 @@ DOCKER_FILE_LOCATION=
 PORT=
 SSH_KEY=$HOME/.ssh/id_rsa
 ENV_COMMAND=
-FILE_INCLUDE=
+FILES_INCLUDE=
 
 while getopts i:d:p:e:f:k:: OPTION; do
   case $OPTION in
@@ -46,7 +46,7 @@ while getopts i:d:p:e:f:k:: OPTION; do
       ENV_COMMAND+="--env "$OPTARG" "
       ;;
     f)
-      FILE_INCLUDE=$OPTARG
+      FILES_INCLUDE+=$OPTARG" "
       ;;
     ?)
       usage
@@ -68,7 +68,7 @@ echo "DOCKER_FILE_LOCATION" = $DOCKER_FILE_LOCATION
 echo "PORT" = $PORT
 echo "SSH_KEY" = $SSH_KEY
 echo "ENV_COMMAND" = $ENV_COMMAND
-echo "FILE_INCLUDE" = $FILE_INCLUDE
+echo "FILES_INCLUDE" = $FILES_INCLUDE
 echo "IMPORT_FOLDER" = $IMPORT_FOLDER
 
 MACHINE_NAME=$IP-machine
@@ -81,8 +81,8 @@ docker-machine create  --driver generic --generic-ip-address $IP $MACHINE_NAME -
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
 docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
-if [[ -n $FILE_INCLUDE ]]; then
-  docker-machine scp $FILE_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
+if [[ -n $FILES_INCLUDE ]]; then
+  docker-machine scp $FILES_INCLUDE $MACHINE_NAME:$IMPORT_FOLDER
 fi
 CONTAINER_VOLUME=/mnt
 
