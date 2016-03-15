@@ -77,7 +77,7 @@ IMAGE_NAME=$IP`echo ${DOCKER_FILE_LOCATION} | tr '[:upper:]' '[:lower:]' | sed "
 echo "IMAGE_NAME" = $IMAGE_NAME
 echo "MACHINE_NAME" = $MACHINE_NAME
 
-docker-machine create  --driver generic --generic-ip-address $IP $MACHINE_NAME --generic-ssh-key $SSH_KEY
+docker-machine create  --driver generic --generic-ip-address $IP --generic-ssh-key $SSH_KEY $MACHINE_NAME
 eval "$(docker-machine env $MACHINE_NAME)"
 docker build --rm -t $IMAGE_NAME $DOCKER_FILE_LOCATION
 docker-machine ssh $MACHINE_NAME "sudo mkdir -p $IMPORT_FOLDER"
